@@ -80,3 +80,11 @@ body {
     width: 1%;
     white-space: nowrap;
 }
+
+#cabecalhoPagina {
+    cursor: pointer;
+}
+
+#cabecalhoPagina:hover {
+    text-decoration: underline;
+}

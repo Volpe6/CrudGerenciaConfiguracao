@@ -13,10 +13,17 @@ const ControlePagina = (function(){
         oContainer.empty();
         e = e.originalEvent;
         if(e.state){
+            sAtual = e.state.link;
             oContainer.html(e.state.html);
+        }
+        else {
+            carregaPaginaUrl();
         }
     }).on('load', function(){
         oContainer = $('#base_pagina');
+        $('#cabecalhoPagina').on('click', function(){
+            carregaPagina('bemVindo');
+        });
         oModal = $('#modalStatus').modal({
              show: false
             ,backdrop: 'static'
@@ -28,14 +35,23 @@ const ControlePagina = (function(){
             ControlePagina.DATA_TABLES_L18N = oRes;
         })
         iniciaNavBar();
+        carregaPaginaUrl();
+    });
+
+    function carregaPaginaUrl(bPush = false){
         var page = getParametroUrl('p');
         if(page){
-            carregaPagina(page + '.html')
+            var id = getParametroUrl('id');
+            var sUrl = page + '.html';
+            if(id){
+                sUrl += '?id=' + id;
+            }
+            carregaPagina(sUrl, bPush);
         }
         else {
-            carregaPagina('bemVindo.html')
+            carregaPagina('bemVindo.html', bPush);
         }
-    });
+    }
 
     function getParametroUrl(sParam){
         var params = new URLSearchParams(document.location.search.substring(1));
@@ -51,13 +67,15 @@ const ControlePagina = (function(){
         });
     }
 
-    function carregaPagina(sLink){
+    function carregaPagina(sLink, bPush = true){
         oContainer.hide();
         $.get('/pages/' + sLink).then(function(sHtml){
             sAtual = sLink;
             oContainer.html(sHtml);
             oContainer.show();
-            window.history.pushState({ "html": sHtml }, "", '?p=' + sLink.replace(/.html$/, ''));
+            if(bPush){
+                window.history.pushState({ "html": sHtml, link: sLink }, "", '?p=' + sLink.replace(/\?/, '&').replace(/.html(&|$)/, '$1'));
+            }
         }, function(){
             carregaPagina('bemVindo.html');
         });
@@ -112,8 +130,9 @@ const ControlePagina = (function(){
         oModal.modal('show');
     }
 
-    function trataErroForm(oRetorno){
+    function trataErroForm(oRetorno, sMensagem){
         var oConteudo = $('<div>');
+        $('<p>').html(sMensagem).appendTo(oConteudo);
         if(oRetorno.message){
             $('<p>').html(oRetorno.message).appendTo(oConteudo);
         }
@@ -126,38 +145,66 @@ const ControlePagina = (function(){
         mostraModalNormal('Erro!', oConteudo);
     }
 
-    function iniciaForm(oForm, sUrl, sMensagem){
+    function iniciaForm(oForm, sUrl, sId, sItem, sSufixo){
+        var id;
+        var sOperacao = 'Incluid' + sSufixo;
         executaImediato(function(){
-            var id = getParametroUrl('id');
+            id = getParametroUrl('id');
+            $('#tituloOperacao').html('Alterar')
             if(id){
-                // TODO Carregar dados para preencher da url.
+                sOperacao = 'Alterad' + sSufixo;
+                oContainer.hide();
+                $.get({
+                    url: sUrl + '/' + id
+                }).then(function(oRetorno){
+                    if(oRetorno.result == AJAX_SUCESSO && oRetorno.registro != null){
+                        oContainer.show();
+                        for (var sCampo in oRetorno.registro){
+                            $('[name=' + sCampo + ']', oForm).val(oRetorno.registro[sCampo]);
+                        }
+                    }
+                    else {
+                        mostraModalNormal('Erro!', 'Registro não encontrado!', function(){
+                            window.history.back();
+                        });
+                        id = null;
+                    }
+                });
             }
         })
         oForm.submit(function(e){
-            var formData = JSON.stringify(oForm.serializeArray().reduce(function(oAccum, oEl){
+            var formData = oForm.serializeArray().reduce(function(oAccum, oEl){
                 oAccum[oEl.name] = oEl.value;
                 return oAccum
-            }, {}));
-            $.ajax({
+            }, {});
+            formData[sId] = id;
+            formData = JSON.stringify(formData);
+            $.post({
                 url: sUrl,
-                type: 'post',
                 data: formData,
                 dataType: "json",
                 contentType : "application/json"
-            }).then(getFuncaoProcessaAjaxSucesso(sMensagem), processaAjaxErro);
+            }).then(getFuncaoProcessaAjaxSucesso(sItem, sSufixo, sOperacao, function(){
+                if(id){
+                    window.history.back();
+                }
+            }), processaAjaxErro);
             e.preventDefault();
             return false;
         });
     }
 
-    function getFuncaoProcessaAjaxSucesso(sMensagem){
+    function getFuncaoProcessaAjaxSucesso(sItem, sSufixo, sOperacao, fnSucesso){
         return function(oRetorno){
             if(oRetorno.result == AJAX_FALHA){
-                trataErroForm(oRetorno.msg);
+                trataErroForm(oRetorno.msg, 'Não foi possível processar ' + sSufixo + ' ' + sOperacao + '...');
             }
             else {
-                mostraModalNormal('Sucesso!', sMensagem);
+                mostraModalNormal('Sucesso!', sItem + ' ' + sOperacao + ' com Sucesso!');
                 $('.form-control').val('');
+                if(fnSucesso){
+                    fnSucesso();
+                }
             }
         }
     }
@@ -192,9 +239,9 @@ const ControlePagina = (function(){
                     });
                     var oAcoes = $('<td>').appendTo(oLinha);
                     $('<button>').html('Remover').addClass('btn btn-danger').on('click', function(sId){
-                        mostraModalConfirma('Deseja prosseguir', 'Deseja mesmo remover o registro? Os dados serão perdidos', function(){
+                        mostraModalConfirma('Deseja prosseguir', 'Deseja mesmo remover o registro? Os dados serão perdidos...', function(){
                             executaImediato(function(){
-                                $.get(oConfig.request + '/remove/' + sId).then(getFuncaoProcessaAjaxSucesso('Registro Removido!'), processaAjaxErro)
+                                $.get(oConfig.request + '/remove/' + sId).then(getFuncaoProcessaAjaxSucesso('Registro', 'o', 'Removido'), processaAjaxErro)
                                 recarregaPagina();
                             });
                         }, null, false);

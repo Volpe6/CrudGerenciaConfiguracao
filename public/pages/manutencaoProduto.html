@@ -1,5 +1,6 @@
 <div class="container">
     <form action="produto" method="POST" id="formProduto" name="produto">
+        <h3><span id="tituloOperacao">Incluir</span> Produto</h3>
         <div class="form-group">
             <label for="descricaoProduto">Descrição:</label>
             <textarea class="form-control" id="descricaoProduto" name="descricao" aria-describedby="descricaoProdutoAjuda" placeholder="Digite a descrição."></textarea>
@@ -14,5 +15,5 @@
     </form>
 </div>
 <script>
-    ControlePagina.iniciaForm($('#formProduto'), '/produto', 'Produto cadastrado com Sucesso!');
+    ControlePagina.iniciaForm($('#formProduto'), '/produto', 'id', 'Produto', 'o');
 </script>
