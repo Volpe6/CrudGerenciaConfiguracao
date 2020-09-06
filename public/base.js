@@ -133,14 +133,19 @@ const ControlePagina = (function(){
     function trataErroForm(oRetorno, sMensagem){
         var oConteudo = $('<div>');
         $('<p>').html(sMensagem).appendTo(oConteudo);
-        if(oRetorno.message){
-            $('<p>').html(oRetorno.message).appendTo(oConteudo);
+        if(typeof(oRetorno) == 'string'){
+            $('<p>').html(oRetorno).appendTo(oConteudo);
         }
-        if(oRetorno.errors){
-            var oUl = $('<ul>').appendTo(oConteudo);
-            oRetorno.errors.forEach(function(oErro){
-                $('<li>').html(oErro.message).appendTo(oUl);
-            });
+        else {
+            if(oRetorno.message){
+                $('<p>').html(oRetorno.message).appendTo(oConteudo);
+            }
+            if(oRetorno.errors){
+                var oUl = $('<ul>').appendTo(oConteudo);
+                oRetorno.errors.forEach(function(oErro){
+                    $('<li>').html(oErro.message).appendTo(oUl);
+                });
+            }
         }
         mostraModalNormal('Erro!', oConteudo);
     }
@@ -235,7 +240,7 @@ const ControlePagina = (function(){
     function getFuncaoProcessaAjaxSucesso(sItem, sSufixo, sOperacao, fnSucesso){
         return function(oRetorno){
             if(oRetorno.result == AJAX_FALHA){
-                trataErroForm(oRetorno.msg, 'Não foi possível processar ' + sSufixo + ' ' + sOperacao + '...');
+                trataErroForm(oRetorno.msg, 'O ' + sItem + ' não foi ' + sOperacao +'...<br/>Não foi possível processar a operação...');
             }
             else {
                 mostraModalNormal('Sucesso!', sItem + ' ' + sOperacao + ' com Sucesso!');

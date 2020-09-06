@@ -103,3 +103,12 @@ body {
     font-weight: 400;
     z-index: -1;
 }
+
+textarea:invalid,input:invalid {
+    outline: none;
+    box-shadow: 0 0 3px 1px red;
+}
+
+form:invalid {
+    outline: none;
+}
