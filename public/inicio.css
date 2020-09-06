@@ -88,3 +88,12 @@ body {
 #cabecalhoPagina:hover {
     text-decoration: underline;
 }
+
+textarea:invalid,input:invalid {
+    outline: none;
+    box-shadow: 0 0 3px 1px red;
+}
+
+form:invalid {
+    outline: none;
+}
