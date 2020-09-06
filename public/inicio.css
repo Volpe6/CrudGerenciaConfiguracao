@@ -47,10 +47,12 @@ body {
 .navegacao {
     background: var(--cor-destaque-2);
     height: 2rem;
+    padding: 0;
 }
 
 .navegacao > ul {
     margin: 0;
+    height: 100%;
 }
 
 .navegacao > ul > li {
