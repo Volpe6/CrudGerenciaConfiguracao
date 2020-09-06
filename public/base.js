@@ -150,8 +150,8 @@ const ControlePagina = (function(){
         var sOperacao = 'Incluid' + sSufixo;
         executaImediato(function(){
             id = getParametroUrl('id');
-            $('#tituloOperacao').html('Alterar')
             if(id){
+                $('#tituloOperacao').html('Alterar');
                 sOperacao = 'Alterad' + sSufixo;
                 oContainer.hide();
                 $.get({
