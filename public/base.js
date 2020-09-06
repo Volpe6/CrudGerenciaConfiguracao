@@ -145,10 +145,45 @@ const ControlePagina = (function(){
         mostraModalNormal('Erro!', oConteudo);
     }
 
+    function iniciaCamposForm(oForm){
+        new InputMask({
+            masked: ".campo-mascara"
+        });
+        $('.busca-cep', oForm).on('change', function(){
+            var self = $(this);
+            var sVal = self.val();
+            if(sVal){
+                sVal = sVal.replace(/\D/g, '')
+                if(sVal.length == 8){
+                    $.get('/cliente/cep/' + sVal).then(trataRetornoCep.bind(self, oForm), function(){
+                        mostraModalNormal('Erro!', 'Não foi possível encontrar o cep informado.', function(){
+                            self.val('');
+                        });
+                    });
+                }
+            }
+        })
+    }
+
+    function trataRetornoCep(oForm, oRetorno){
+        if(oRetorno.erro){
+            mostraModalNormal('Erro!', 'Não foi possível encontrar o cep informado.', function(){
+                this.val('');
+            });
+        }
+        else {
+            $('.preenche-cep', oForm).each(function(){
+                var self = $(this);
+                self.val(oRetorno[self.attr('data-cep-fill') || self.attr('name')]);
+            })
+        }
+    }
+
     function iniciaForm(oForm, sUrl, sId, sItem, sSufixo){
         var id;
         var sOperacao = 'Incluid' + sSufixo;
         executaImediato(function(){
+            iniciaCamposForm();
             id = getParametroUrl('id');
             if(id){
                 $('#tituloOperacao').html('Alterar');
@@ -174,6 +209,9 @@ const ControlePagina = (function(){
         })
         oForm.submit(function(e){
             var formData = oForm.serializeArray().reduce(function(oAccum, oEl){
+                if($('[name="' + oEl.name + '"]', oForm).attr('data-remove-especial')){
+                    oEl.value = oEl.value.replace(/\W/g, '');
+                }
                 oAccum[oEl.name] = oEl.value;
                 return oAccum
             }, {});
