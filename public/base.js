@@ -191,7 +191,7 @@ const ControlePagina = (function(){
                         $('<td>').html(oRegistro[sColuna]).appendTo(oLinha);
                     });
                     var oAcoes = $('<td>').appendTo(oLinha);
-                    $('<button>').html('Remover').on('click', function(sId){
+                    $('<button>').html('Remover').addClass('btn btn-danger').on('click', function(sId){
                         mostraModalConfirma('Deseja prosseguir', 'Deseja mesmo remover o registro? Os dados serão perdidos', function(){
                             executaImediato(function(){
                                 $.get(oConfig.request + '/remove/' + sId).then(getFuncaoProcessaAjaxSucesso('Registro Removido!'), processaAjaxErro)
@@ -200,7 +200,7 @@ const ControlePagina = (function(){
                         }, null, false);
                     }.bind(this, oRegistro[oConfig.chave[0]])).appendTo(oAcoes);
                     if(oConfig.manutencao){
-                        $('<button>').html('Alterar').on('click', function(sId){
+                        $('<button>').html('Alterar').addClass('btn btn-primary').on('click', function(sId){
                             carregaPagina(oConfig.manutencao + '?id=' + sId);
                         }.bind(this, oRegistro[oConfig.chave[0]])).appendTo(oAcoes);
                     }
