@@ -1,4 +1,5 @@
 const { DataTypes, Model } = require('sequelize');
+const Pedido   = require('./pedido');
 const sequelize = require('../config/database');
 
 class Cliente extends Model {}
@@ -43,5 +44,6 @@ Cliente.init({
     timestamps: false
 });
 
+Cliente.hasMany(Pedido);
 
 module.exports = Cliente;

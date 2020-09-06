@@ -26,4 +26,7 @@ rotas.get('/cliente/cep/:cep'  , controllerCliente.getCep);
 
 rotas.post('/cliente', controllerCliente.store);
 
+//Pedido
+rotas.post('/pedido', controllerCliente.store);
+
 module.exports = rotas;
