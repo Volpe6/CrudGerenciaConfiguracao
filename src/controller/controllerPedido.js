@@ -13,10 +13,11 @@ const ControllerProduto = {
             registros = await Pedido.findAll({
                 include: [
                     {
-                        model: Cliente,
+                        model: Cliente
                     },
                     {
                         model: Produto,
+                        as: 'produtos'
                     }
                 ]
                 
@@ -53,6 +54,7 @@ const ControllerProduto = {
                     },
                     {
                         model: Produto,
+                        as: 'produtos'
                     }
                 ],
                 where: { 
@@ -86,7 +88,7 @@ const ControllerProduto = {
             }
             return true;
         }
-
+        
         //verifica se os atributos do obj nao estao em branco ou nao sao nulos
         function isAtributosValidos(obj) {
             for([key, value] of Object.entries(obj)) {
@@ -104,7 +106,7 @@ const ControllerProduto = {
         const entidade = req.body;
         const campos   = [];
         let mensagem   = "";//mensagem a ser repassada ao front
-        if(!existeAtributos(['idCliente', 'produtos'], entidade) || !isAtributosValidos(entidade)) {
+        if(!existeAtributos(['cliente_id', 'produtos'], entidade) || !isAtributosValidos(entidade)) {
             return res.status(200).json({
                 result: 'erro',
                 msg   : `O campo '${campos[0]}' esta em branco.`
@@ -129,7 +131,7 @@ const ControllerProduto = {
         //tenta incluir/atualizar o registro
         try {
             if(entidade.id) {
-                await Pedido.update({ ClienteId: entidade.idCliente },{ where: { id: entidade.id }});
+                await Pedido.update({ cliente_id: entidade.cliente_id },{ where: { id: entidade.id }});
 
                 for(let i = 0; i < entidade.produtos.length; i++) {
                     let produtoPedido = entidade.produtos[i];
@@ -140,8 +142,8 @@ const ControllerProduto = {
                     }, {
                         where: {
                             [Op.and] : [
-                                { ProdutoId:produtoPedido.id },
-                                { PedidoId:entidade.id }
+                                { produto_id:produtoPedido.id },
+                                { pedido_id:entidade.id }
                             ]
                         }
                     });
@@ -151,14 +153,14 @@ const ControllerProduto = {
             } else {
 
                 model = await Pedido.create({ 
-                    ClienteId: entidade.idCliente
+                    cliente_id: entidade.cliente_id
                 });
 
                 for(let i = 0; i < entidade.produtos.length; i++) {
                     let produtoPedido = entidade.produtos[i];
                     pedido = await PedidoProduto.create({
-                        PedidoId      : model.id,
-                        ProdutoId     : produtoPedido.id,
+                        pedido_id     : model.id,
+                        produto_id    : produtoPedido.id,
                         quantidade    : produtoPedido.quantidade,
                         preco_unitario: produtoPedido.preco_unitario,
                         desconto      : produtoPedido.desconto
