@@ -44,6 +44,9 @@ Cliente.init({
     timestamps: false
 });
 
-Cliente.hasMany(Pedido);
+Cliente.hasMany(Pedido, {
+    onDelete: 'CASCADE'
+});
+Pedido.belongsTo(Cliente);
 
 module.exports = Cliente;

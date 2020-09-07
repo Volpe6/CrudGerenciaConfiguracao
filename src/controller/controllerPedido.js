@@ -2,11 +2,32 @@ const Produto       = require('../model/produto');
 const Cliente       = require('../model/cliente');
 const Pedido        = require('../model/pedido');
 const PedidoProduto = require('../model/PedidoProduto');
+const { Op }        = require('sequelize');
 
 const ControllerProduto = {
     //retorna todos os registros da tabela
     async index(req, res) {
-        const registros = await PedidoProduto.findAll();
+        let registros = null;
+
+        try {
+            registros = await Pedido.findAll({
+                include: [
+                    {
+                        model: Cliente,
+                    },
+                    {
+                        model: Produto,
+                    }
+                ]
+                
+            });
+        } catch (er) {
+            return res.status(200).json({
+                result   : 'erro',
+                msg      : er.message,
+            });    
+        }
+
         return res.status(200).json({
             result   : 'sucesso',
             msg      : 'registros recuperados com sucesso',
@@ -25,7 +46,19 @@ const ControllerProduto = {
         let registro = null;
         let mensagem = '';
         try {
-            registro = await Produto.findOne({ where: { id: id } });
+            registro = await Pedido.findOne({ 
+                include: [
+                    {
+                        model: Cliente,
+                    },
+                    {
+                        model: Produto,
+                    }
+                ],
+                where: { 
+                    id: id 
+                } 
+            });
             registro = (!(registro == null)) ? registro.dataValues : registro;
             mensagem = registro == null? 'Registro não encontrado' : 'registro recuperado com sucesso' 
         } catch (error) {
@@ -42,6 +75,8 @@ const ControllerProduto = {
     },
     //salva/atualiza
     async store(req, res) {
+        function verificaCampos(obj) {}
+
         const entidade = req.body;
         
         let model    = null;
@@ -49,38 +84,48 @@ const ControllerProduto = {
         //tenta incluir/atualizar o registro
         try {
             if(entidade.id) {
-                await Produto.update({
-                    descricao : entidade.descricao,
-                    fabricante: entidade.fabricante
-                },{
-                    where: {
-                        id: entidade.id
-                    }});
+                await Pedido.update({ ClienteId: entidade.cliente_id },{ where: { id: entidade.id }});
+
+                for(let i = 0; i < entidade.produtos.length; i++) {
+                    let produtoPedido = entidade.produtos[i];
+                    pedido = await PedidoProduto.update({
+                        quantidade    : produtoPedido.quantidade,
+                        preco_unitario: produtoPedido.preco_unitario,
+                        desconto      : produtoPedido.desconto
+                    }, {
+                        where: {
+                            [Op.and] : [
+                                { ProdutoId:produtoPedido.id },
+                                { PedidoId:entidade.id }
+                            ]
+                        }
+                    });
+                }
+
                 mensagem = 'Registro atualizado com sucesso';
             } else {
 
-                let cliente = Cliente.findOne({ where: { id: entidade.cliente_id } });
-
                 model = await Pedido.create({ 
-                    cliente
+                    ClienteId: entidade.cliente_id
                 });
 
-                model.dataValues.id;
                 for(let i = 0; i < entidade.produtos.length; i++) {
                     let produtoPedido = entidade.produtos[i];
-                    let produto = Produto.findOne({ where: { id: produtoPedido.id } });
-                    await PedidoProduto.create({
-                        model,
-                        produto,
+                    pedido = await PedidoProduto.create({
+                        PedidoId      : model.id,
+                        ProdutoId     : produtoPedido.id,
+                        quantidade    : produtoPedido.quantidade,
+                        preco_unitario: produtoPedido.preco_unitario,
+                        desconto      : produtoPedido.desconto
                     });
                 }
 
                 mensagem = 'Registro incluido com sucesso';
             }
-        } catch (error) {
+        } catch (er) {
             return res.status(200).json({
                 result: 'erro',
-                msg   : error
+                msg   : er.message
             });
         }
         return res.status(200).json({
@@ -100,11 +145,18 @@ const ControllerProduto = {
         }
         //tenta remover o registro
         try {
-            await Produto.destroy({ where: {id: id } });
-        } catch (error) {
+            registroPedido = await PedidoProduto.findAll({
+                where: { PedidoId:id }
+            });
+            for(let i = 0; i < registroPedido.length; i++) {
+                let registro = registroPedido[i];
+                registro.destroy();
+            }
+            await Pedido.destroy({ where: {id: id } });
+        } catch (er) {
             return res.status(200).json({
                 result: 'erro',
-                msg   : error
+                msg   : er.message
             });
         }
         return res.status(200).json({
