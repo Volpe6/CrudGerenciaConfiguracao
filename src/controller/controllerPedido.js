@@ -75,9 +75,19 @@ const ControllerProduto = {
     },
     //salva/atualiza
     async store(req, res) {
-        function verificaCampos(obj) {}
 
         const entidade = req.body;
+        for([key, value] of Object.entries(entidade)) {
+            if(value == "" || value == null) {
+                if(key == "id") {
+                    continue;
+                }
+                return res.status(200).json({
+                    result: 'erro',
+                    msg   : `O campo '${key}' esta em branco.`
+                });
+            }
+        }
         
         let model    = null;
         let mensagem = '';//mensagem a ser repassada ao front
