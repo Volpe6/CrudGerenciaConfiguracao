@@ -157,18 +157,41 @@ const ControlePagina = (function(){
         new InputMask({
             masked: ".campo-mascara"
         });
+        var oSubmit = $('button[type="submit"]', oForm);
         $('.busca-cep', oForm).on('change', function(){
             var self = $(this);
             var sVal = self.val();
             if(sVal){
                 sVal = sVal.replace(/\D/g, '')
                 if(sVal.length == 8){
-                    $.get('/cliente/cep/' + sVal).then(trataRetornoCep.bind(self, oForm), function(){
+                    oSubmit.attr('disabled', true);
+                    $.get('/cliente/cep/' + sVal).then(function(oRetorno){
+                        oSubmit.removeAttr('disabled');
+                        trataRetornoCep.apply(self, [oForm, oRetorno]);
+                    }, function(){
+                        oSubmit.removeAttr('disabled');
                         mostraModalNormal('Erro!', 'Não foi possível encontrar o cep informado.', function(){
                             self.val('');
                         });
                     });
                 }
+            }
+        });
+        $('.form-externo', oForm).on('change', function(){
+            var self = $(this);
+            var sVal = self.val();
+            $('#' + self.attr('data-alvo')).html('');
+            if(sVal){
+                oSubmit.attr('disabled', true);
+                $.get(self.attr('data-request') + sVal).then(function(oRetorno){
+                    oSubmit.removeAttr('disabled');
+                    trataRetornoExterno(self, oRetorno);
+                }, function(){
+                    oSubmit.removeAttr('disabled');
+                    mostraModalNormal('Erro!', 'Não foi possível encontrar o registro informado.', function(){
+                        self.val('');
+                    });
+                });
             }
         })
     }
@@ -184,6 +207,17 @@ const ControlePagina = (function(){
                 var self = $(this);
                 self.val(oRetorno[self.attr('data-cep-fill') || self.attr('name')]);
             })
+        }
+    }
+
+    function trataRetornoExterno(oCampo, oRetorno){
+        if(oRetorno.result == AJAX_SUCESSO && oRetorno.registro != null){
+            $('#' + oCampo.attr('data-alvo')).html(oRetorno.registro[oCampo.attr('data-coluna')]);
+        }
+        else {
+            mostraModalNormal('Erro!', 'Não foi possível encontrar o registro informado.', function(){
+                oCampo.val('');
+            });
         }
     }
 
@@ -214,7 +248,7 @@ const ControlePagina = (function(){
                     }
                 });
             }
-        })
+        });
         oForm.submit(function(e){
             var formData = oForm.serializeArray().reduce(function(oAccum, oEl){
                 if($('[name="' + oEl.name + '"]', oForm).attr('data-remove-especial')){
@@ -234,6 +268,9 @@ const ControlePagina = (function(){
                 if(id){
                     window.history.back();
                 }
+                else {
+                    $('.form-control').val('').first().focus()[0].scrollIntoView();
+                }
             }), processaAjaxErro);
             e.preventDefault();
             return false;
@@ -246,11 +283,11 @@ const ControlePagina = (function(){
                 trataErroForm(oRetorno.msg, 'O ' + sItem + ' não foi ' + sOperacao +'...<br/>Não foi possível processar a operação...');
             }
             else {
-                mostraModalNormal('Sucesso!', sItem + ' ' + sOperacao + ' com Sucesso!');
-                $('.form-control').val('');
-                if(fnSucesso){
-                    fnSucesso();
-                }
+                mostraModalNormal('Sucesso!', sItem + ' ' + sOperacao + ' com Sucesso!', function(){
+                    if(fnSucesso){
+                        fnSucesso();
+                    }
+                });
             }
         }
     }

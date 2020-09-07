@@ -108,3 +108,20 @@ form:invalid {
 :focus {
     outline: auto var(--cor-destaque-4) !IMPORTANT;
 }
+
+button, .form-control {
+    scroll-margin-top: 3rem;
+    scroll-margin-bottom: 4.5rem;
+}
+
+.form-externo {
+    display: inline-block;
+    width: 5rem;
+}
+
+
+.form-externo-alvo {
+    width: calc(100% - 6rem);
+    padding-left: 1em;
+    display: inline-block;
+}

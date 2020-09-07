@@ -1,6 +1,13 @@
 <div class="container">
     <form action="pedido" method="POST" id="formPedido" name="pedido">
         <h3><span id="tituloOperacao">Incluir</span> Pedido</h3>
+        <div class="form-group">
+            <label for="idCliente">Cliente:</label><br/>
+            <input type="number" class="form-control form-externo" data-alvo="clienteNome" data-request="/cliente/" data-coluna="nome"
+                id="idCliente" required name="nome" aria-describedby="idClienteAjuda" min="1"></textarea>
+            <small id="clienteNome" class="form-text text-muted form-externo-alvo"></small>
+            <small id="idClienteAjuda" class="form-text text-muted">Digite o código do cliente para carregar automáticamente.</small>
+        </div>
         <button type="submit" class="btn btn-primary">Enviar</button>
     </form>
 </div>
