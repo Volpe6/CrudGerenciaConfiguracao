@@ -75,26 +75,61 @@ const ControllerProduto = {
     },
     //salva/atualiza
     async store(req, res) {
+        //verifica se os atributos existem no obj
+        function existeAtributos(atributos, obj) {
+            for(let i = 0; i < atributos.length; i++) {
+                let attr = atributos[i];
+                if(!obj.hasOwnProperty(`${attr}`)) {
+                    campos.push(attr);
+                    return false;
+                }
+            }
+            return true;
+        }
 
-        const entidade = req.body;
-        for([key, value] of Object.entries(entidade)) {
-            if(value == "" || value == null) {
+        //verifica se os atributos do obj nao estao em branco ou nao sao nulos
+        function isAtributosValidos(obj) {
+            for([key, value] of Object.entries(obj)) {
                 if(key == "id") {
                     continue;
                 }
+                if(value == "" || value == null) {
+                    campos.push(key);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        const entidade = req.body;
+        const campos   = [];
+        let mensagem   = "";//mensagem a ser repassada ao front
+        if(!existeAtributos(['idCliente', 'produtos'], entidade) || !isAtributosValidos(entidade)) {
+            return res.status(200).json({
+                result: 'erro',
+                msg   : `O campo '${campos[0]}' esta em branco.`
+            });
+        }
+
+        let produtos = entidade.produtos;
+        for(let i = 0; i < produtos.length; i++) {
+            if(
+                !existeAtributos(["id", "quantidade", "preco_unitario", "desconto"], produtos[i])
+                ||
+                !isAtributosValidos(produtos[i])
+            ) {
                 return res.status(200).json({
                     result: 'erro',
-                    msg   : `O campo '${key}' esta em branco.`
-                });
+                    msg   : `O campo '${campos[0]}' esta em branco.` 
+                }); 
             }
         }
         
         let model    = null;
-        let mensagem = '';//mensagem a ser repassada ao front
         //tenta incluir/atualizar o registro
         try {
             if(entidade.id) {
-                await Pedido.update({ ClienteId: entidade.cliente_id },{ where: { id: entidade.id }});
+                await Pedido.update({ ClienteId: entidade.idCliente },{ where: { id: entidade.id }});
 
                 for(let i = 0; i < entidade.produtos.length; i++) {
                     let produtoPedido = entidade.produtos[i];
@@ -116,7 +151,7 @@ const ControllerProduto = {
             } else {
 
                 model = await Pedido.create({ 
-                    ClienteId: entidade.cliente_id
+                    ClienteId: entidade.idCliente
                 });
 
                 for(let i = 0; i < entidade.produtos.length; i++) {
