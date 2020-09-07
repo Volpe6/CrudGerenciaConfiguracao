@@ -21,12 +21,11 @@ const ControlePagina = (function(){
         }
     }).on('load', function(){
         oContainer = $('#base_pagina');
-        $('#cabecalhoPagina').on('click', function(){
-            carregaPagina('bemVindo');
-        });
         oModal = $('#modalStatus').modal({
              show: false
             ,backdrop: 'static'
+        }).on('shown.bs.modal', function(event) {
+            $('.btn-primary', modalBotoes).focus();
         });
         modalTitulo   = $('#modalStatusTitulo',   oModal);
         modalConteudo = $('#modalStatusConteudo', oModal);
@@ -63,7 +62,11 @@ const ControlePagina = (function(){
             var oEl = $(this);
             oEl.on('click', function(sTarget){
                 carregaPagina(sTarget + '.html');
-            }.bind(null, oEl.attr('data-target')))
+            }.bind(null, oEl.attr('data-target'))).on('keydown', function(e){
+                if(e.key && (e.key.toLowerCase() == 'space' || e.key.toLowerCase() == 'enter')){
+                    $(this).trigger('click');
+                }
+            });
         });
     }
 
@@ -94,8 +97,9 @@ const ControlePagina = (function(){
     function mostraModalNormal(sTitulo, sConteudo, fnOk, bDismiss = true){
         modalTitulo.html(sTitulo);
         modalConteudo.html(sConteudo);
+        oModal.modal('show');
         $('.btn', modalBotoes).show().off('click');
-        $('.btn-primary', modalBotoes).on('click', function(){
+        $('.btn-primary', modalBotoes).focus().on('click', function(){
             if(bDismiss){
                 oModal.modal('hide');
             }
@@ -104,14 +108,14 @@ const ControlePagina = (function(){
             }
         });
         $('.btn-secondary', modalBotoes).hide();
-        oModal.modal('show');
     }
 
     function mostraModalConfirma(sTitulo, sConteudo, fnOk, fnCancela, bDismissOk = true, bDismissCancela = true){
         modalTitulo.html(sTitulo);
         modalConteudo.html(sConteudo);
+        oModal.modal('show');
         $('.btn', modalBotoes).show().off('click');
-        $('.btn-primary', modalBotoes).on('click', function(){
+        $('.btn-primary', modalBotoes).focus().on('click', function(){
             if(bDismissOk){
                 oModal.modal('hide');
             }
@@ -127,7 +131,6 @@ const ControlePagina = (function(){
                 fnCancela();
             }
         });
-        oModal.modal('show');
     }
 
     function trataErroForm(oRetorno, sMensagem){
