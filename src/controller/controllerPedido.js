@@ -193,7 +193,7 @@ const ControllerProduto = {
         //tenta remover o registro
         try {
             registroPedido = await PedidoProduto.findAll({
-                where: { PedidoId:id }
+                where: { pedido_id:id }
             });
             for(let i = 0; i < registroPedido.length; i++) {
                 let registro = registroPedido[i];
