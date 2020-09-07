@@ -16,7 +16,7 @@ const sequelize = new Sequelize(process.env.DB_DATABASE, process.env.DB_USER, pr
 async function sincronizaTabelas() {
     try {
         await sequelize.sync(
-            // {force: true}//Isso cria a tabela, descartando-a primeiro se ela já existia
+            {force: true}//Isso cria a tabela, descartando-a primeiro se ela já existia
         );
     } catch (error) {
         console.log(error);
