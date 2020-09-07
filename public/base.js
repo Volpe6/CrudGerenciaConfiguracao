@@ -193,7 +193,31 @@ const ControlePagina = (function(){
                     });
                 });
             }
+        });
+        $('.cadastro-multiplo', oForm).each(function(){
+            preparaCadastroMultiplo($(this));
         })
+    }
+
+    function preparaCadastroMultiplo(oObj){
+        var oForm = $('>.form-cadastro-multiplo', oObj);
+        oForm.detach();
+        var oContainer = $('.container-cadastro-multiplo', oObj);
+        var iAtual = 0;
+        $('.btn-success', oObj).on('click', function(e){
+            $('.cadastro-multiplo-vazio', oContainer).hide();
+            iAtual++;
+            var oNovoForm = oForm.clone().appendTo(oContainer);
+            $('>.btn-danger', oNovoForm).on('click', function(){
+                oNovoForm.detach();
+                if(oContainer.children().length == 1){
+                    $('.cadastro-multiplo-vazio', oContainer).show();
+                }
+            });
+            oNovoForm.show();
+            e.preventDefault();
+            return false;
+        });
     }
 
     function trataRetornoCep(oForm, oRetorno){
@@ -354,7 +378,7 @@ const ControlePagina = (function(){
             });
             return aRet.join(', ');
         }
-        if(typeof(oRegistro[sAtu]) == 'object'){
+        if(oRegistro[sAtu] && typeof(oRegistro[sAtu]) == 'object'){
             return preparaRegistroComplexo(aColunas, oRegistro[sAtu]);
         }
         return oRegistro[sAtu];

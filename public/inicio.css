@@ -97,12 +97,11 @@ body {
 }
 
 textarea:invalid,input:invalid {
-    outline: none;
     box-shadow: 0 0 3px 1px red;
 }
 
-form:invalid {
-    outline: none;
+:invalid {
+    outline: none !important;
 }
 
 :focus {
@@ -122,6 +121,26 @@ button, .form-control {
 
 .form-externo-alvo {
     width: calc(100% - 6rem);
-    padding-left: 1em;
+    padding-left: 1rem;
     display: inline-block;
+}
+
+.cadastro-multiplo {
+    padding: 0 0 1rem 1rem;
+}
+
+.cadastro-multiplo > .container-cadastro-multiplo {
+    border: 0.2rem solid var(--cor-destaque-1);
+}
+
+.form-cadastro-multiplo {
+    padding: 0 0.5rem;
+}
+
+.form-cadastro-multiplo:not(:first-of-type) {
+    border-top: 0.2rem solid var(--cor-destaque-1);
+}
+
+.cadastro-multiplo > .btn-success {
+    margin-bottom: 0.5rem;
 }
