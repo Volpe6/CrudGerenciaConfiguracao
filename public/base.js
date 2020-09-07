@@ -202,8 +202,13 @@ const ControlePagina = (function(){
                 }).then(function(oRetorno){
                     if(oRetorno.result == AJAX_SUCESSO && oRetorno.registro != null){
                         oContainer.show();
+                        
                         for (var sCampo in oRetorno.registro){
-                            $('[name=' + sCampo + ']', oForm).val(oRetorno.registro[sCampo]);
+                            var oCampo = $('[name=' + sCampo + ']', oForm);
+                            oCampo.val(oRetorno.registro[sCampo]);
+                            if(oCampo.hasClass('masked')){
+                                oCampo[0].dispatchEvent(new KeyboardEvent('keyup'));
+                            }
                         }
                     }
                     else {
