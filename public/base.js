@@ -366,7 +366,9 @@ const ControlePagina = (function(){
                                 if(aNovo.indexOf(oAtu[sEl]) > -1){
                                     throw new Error(self.attr('data-mensagem-unico') + ' não pode estar duplicado.');
                                 }
-                                aNovo.push(oAtu[sEl]);
+                                if(oAtu[sEl]){
+                                    aNovo.push(oAtu[sEl]);
+                                }
                             });
                         }
                         else {
@@ -402,8 +404,12 @@ const ControlePagina = (function(){
         var id;
         var sOperacao = 'Incluid' + sSufixo;
         executaImediato(function(){
-            iniciaCamposForm();
             id = getParametroUrl('id');
+            if(id){
+                $('.desativa-altera', oForm).attr('disabled', true);
+                $('.oculta-altera', oForm).hide();
+            }
+            iniciaCamposForm();
             if(id){
                 $('#tituloOperacao').html('Alterar');
                 sOperacao = 'Alterad' + sSufixo;
@@ -458,11 +464,15 @@ const ControlePagina = (function(){
             if($(e.originalEvent.submitter).attr('type') != 'submit'){
                 return false;
             }
+            if(id){
+                $('.desativa-altera', oForm).attr('disabled', false);
+            }
             var formData = extraiDadosForm(oForm);
             limpaFormData(formData);
             formData[sId] = id;
             if(validaFormData(oForm, formData)){
                 formData = JSON.stringify(formData);
+                $('.desativa-altera', oForm).attr('disabled', true);
                 $.post({
                     url: sUrl,
                     data: formData,
