@@ -1,31 +1,31 @@
 <div class="container">
-    <button id="botaoIncluirProdutos" class="btn btn-success">Novo</button>
-    <table id="dataTableListaProdutos" class="tabela-dados tabela-dados-acoes table table-striped table-bordered" style="width:100%; display: none;">
+    <button id="botaoIncluirPedidos" class="btn btn-success">Novo</button>
+    <table id="dataTableListaPedidos" class="tabela-dados tabela-dados-acoes table table-striped table-bordered" style="width:100%; display: none;">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Descrição</th>
-                <th>Fabricante</th>
-                <th>Açoes</th>
+                <th>Código</th>
+                <th>Cliente</th>
+                <th>Produtos</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
         </tbody>
     </table>
     <script>
-        $('#botaoIncluirProdutos').on('click', function(){
-            ControlePagina.carregaPagina('manutencaoProduto.html');
+        $('#botaoIncluirPedidos').on('click', function(){
+            ControlePagina.carregaPagina('manutencaoPedidos.html');
         })
-        oTabela = $('#dataTableListaProdutos');
+        oTabela = $('#dataTableListaPedidos');
         ControlePagina.carregaRegistrosHtml({
-                 request:    'produto'
+                 request:    'pedido'
                 ,chave:      ['id']
-                ,colunas:    ['id', 'descricao', 'fabricante']
+                ,colunas:    ['id', 'cliente.nome', 'produtos.descricao']
                 ,alvo:       $('>tbody', oTabela)
-                ,manutencao: 'manutencaoProduto.html'
+                ,manutencao: 'manutencaoPedidos.html'
         }).then(function(){
             oTabela.DataTable({
-                "paging": false
+                 "paging": false
                 ,"info": false
                 ,"language": ControlePagina.DATA_TABLES_L18N
                 ,"columns": [

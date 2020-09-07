@@ -97,14 +97,60 @@ body {
 }
 
 textarea:invalid,input:invalid {
-    outline: none;
     box-shadow: 0 0 3px 1px red;
 }
 
-form:invalid {
-    outline: none;
+:invalid {
+    outline: none !important;
 }
 
 :focus {
     outline: auto var(--cor-destaque-4) !IMPORTANT;
+}
+
+button, .form-control {
+    scroll-margin-top: 3rem;
+    scroll-margin-bottom: 4.5rem;
+}
+
+.form-externo {
+    display: inline-block;
+    width: 5rem;
+}
+
+
+.form-externo-alvo {
+    width: calc(100% - 6rem);
+    padding-left: 1rem;
+    display: inline-block;
+}
+
+.cadastro-multiplo {
+    padding: 0 0 1rem 1rem;
+}
+
+.cadastro-multiplo > .container-cadastro-multiplo {
+    border: 0.2rem solid var(--cor-destaque-1);
+}
+
+.form-cadastro-multiplo {
+    padding: 0 0.5rem;
+}
+
+.form-cadastro-multiplo:not(:first-of-type) {
+    border-top: 0.2rem solid var(--cor-destaque-1);
+}
+
+.cadastro-multiplo > .btn-success {
+    margin-bottom: 0.5rem;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
 }

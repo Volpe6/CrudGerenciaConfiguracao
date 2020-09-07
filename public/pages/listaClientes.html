@@ -3,6 +3,7 @@
     <table id="dataTableListaProdutos" class="tabela-dados tabela-dados-acoes table table-striped table-bordered" style="width:100%; display: none;">
         <thead>
             <tr>
+                <th>Id</th>
                 <th>Nome</th>
                 <th>CPF</th>
                 <th>Logradouro</th>
@@ -25,7 +26,7 @@
         ControlePagina.carregaRegistrosHtml({
                  request:    'cliente'
                 ,chave:      ['id']
-                ,colunas:    ['nome', 'cpf', 'logradouro', 'numero', 'bairro', 'cidade', 'cep', 'estado']
+                ,colunas:    ['id', 'nome', 'cpf', 'logradouro', 'numero', 'bairro', 'cidade', 'cep', 'estado']
                 ,alvo:       $('>tbody', oTabela)
                 ,manutencao: 'manutencaoCliente.html'
         }).then(function(){
@@ -34,6 +35,7 @@
                 ,"info": false
                 ,"language": ControlePagina.DATA_TABLES_L18N
                 ,"columns": [
+                    null,
                     null,
                     null,
                     null,

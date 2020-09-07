@@ -1,4 +1,5 @@
 const { DataTypes, Model } = require('sequelize');
+const Pedido   = require('./pedido');
 const sequelize = require('../config/database');
 
 class Cliente extends Model {}
@@ -38,10 +39,15 @@ Cliente.init({
 }, {
     //outras opções do modelo
     sequelize,//instancia da conexao
-    modelName: 'Cliente',
+    modelName: 'cliente',
     tableName: 'tbcliente',
     timestamps: false
 });
 
+Cliente.hasMany(Pedido, {
+    onDelete: 'CASCADE',
+    foreignKey: 'cliente_id'
+});
+Pedido.belongsTo(Cliente, { foreignKey: 'cliente_id' });
 
 module.exports = Cliente;
