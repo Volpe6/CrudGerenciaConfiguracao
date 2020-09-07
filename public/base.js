@@ -180,7 +180,10 @@ const ControlePagina = (function(){
         $('.form-externo', oForm).on('change', function(){
             var self = $(this);
             var sVal = self.val();
-            $('#' + self.attr('data-alvo')).html('');
+            var aCampos = self.attr('data-alvo').split(',');
+            aCampos.forEach(function(sEl){
+                $('#' + sEl).html('');
+            })
             if(sVal){
                 oSubmit.attr('disabled', true);
                 $.get(self.attr('data-request') + sVal).then(function(oRetorno){
@@ -191,7 +194,11 @@ const ControlePagina = (function(){
                     mostraModalNormal('Erro!', 'Não foi possível encontrar o registro informado.', function(){
                         self.val('');
                     });
+                    self.trigger('retornoAjaxVazio');
                 });
+            }
+            else {
+                self.trigger('retornoAjaxVazio');
             }
         });
         $('.form-numerico').each(function(){
@@ -227,6 +234,7 @@ const ControlePagina = (function(){
 
     function preparaCadastroMultiplo(oObj){
         var oForm = $('>.form-cadastro-multiplo', oObj);
+        oObj.data('form', oForm);
         oForm.detach();
         var oContainer = $('.container-cadastro-multiplo', oObj);
         var iAtual = 0;
@@ -268,12 +276,27 @@ const ControlePagina = (function(){
 
     function trataRetornoExterno(oCampo, oRetorno){
         if(oRetorno.result == AJAX_SUCESSO && oRetorno.registro != null){
-            $('#' + oCampo.attr('data-alvo')).html(oRetorno.registro[oCampo.attr('data-coluna')]);
+            var aCampos = oCampo.attr('data-alvo').split(',');
+            var aColunas = oCampo.attr('data-coluna').split(',');
+            for(var iCampo in aCampos){
+                oAlvo = $('#' + aCampos[iCampo]);
+                if(oAlvo.hasClass('form-control')){
+                    if(!oAlvo.val()){
+                        oAlvo.val(oRetorno.registro[aColunas[iCampo]]);
+                        oAlvo.trigger('change');
+                    }
+                }
+                else {
+                    oAlvo.html(oRetorno.registro[aColunas[iCampo]]);
+                }
+            }
+            oCampo.trigger('retornoAjax', oRetorno.registro);
         }
         else {
             mostraModalNormal('Erro!', 'Não foi possível encontrar o registro informado.', function(){
                 oCampo.val('');
             });
+            oCampo.trigger('retornoAjaxVazio');
         }
     }
 

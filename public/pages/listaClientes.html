@@ -12,6 +12,7 @@
                 <th>Cidade</th>
                 <th>CEP</th>
                 <th>Estado</th>
+                <th>Desconto</th>
                 <th>Açoes</th>
             </tr>
         </thead>
@@ -26,7 +27,7 @@
         ControlePagina.carregaRegistrosHtml({
                  request:    'cliente'
                 ,chave:      ['id']
-                ,colunas:    ['id', 'nome', 'cpf', 'logradouro', 'numero', 'bairro', 'cidade', 'cep', 'estado']
+                ,colunas:    ['id', 'nome', 'cpf', 'logradouro', 'numero', 'bairro', 'cidade', 'cep', 'estado', 'desconto_padrao']
                 ,alvo:       $('>tbody', oTabela)
                 ,manutencao: 'manutencaoCliente.html'
         }).then(function(){
@@ -35,6 +36,7 @@
                 ,"info": false
                 ,"language": ControlePagina.DATA_TABLES_L18N
                 ,"columns": [
+                    null,
                     null,
                     null,
                     null,

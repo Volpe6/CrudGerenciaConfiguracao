@@ -8,14 +8,14 @@
             <small id="clienteNome" class="form-text text-muted form-externo-alvo"></small>
             <small id="idClienteAjuda" class="form-text text-muted">Digite o código do cliente para carregar automáticamente.</small>
         </div>
-        <fieldset class="cadastro-multiplo" name="produtos" data-origem-dados="pedidoProduto" data-unico="produtos[{$i}].id" data-mensagem-unico="O mesmo produto">
+        <fieldset class="cadastro-multiplo" id="formProdutos" name="produtos" data-origem-dados="pedidoProduto" data-unico="produtos[{$i}].id" data-mensagem-unico="O mesmo produto">
             <div class="container-cadastro-multiplo">
                 <span class="cadastro-multiplo-vazio">Nenhum Produto adicionado.</span>
             </div>
             <div class="form-group form-cadastro-multiplo" style="display: none;">
                 <div class="form-group">
                     <label for="idProduto{$i}">Produto:</label><br/>
-                    <input type="number" class="form-control form-externo desativa-altera" data-alvo="produto{$i}Nome" data-request="/produto/" data-coluna="descricao"
+                    <input type="number" class="form-control form-externo desativa-altera" data-alvo="produto{$i}Nome,precoProduto{$i}" data-request="/produto/" data-coluna="descricao,preco_unitario"
                         id="idProduto{$i}" required name="produtos[{$i}].id" min="1">
                     <small id="produto{$i}Nome" class="form-text text-muted form-externo-alvo"></small>
                 </div>
@@ -30,7 +30,7 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="descProduto{$i}">Desconto (%):</label><br/>
-                        <input class="form-control form-numerico" id="descProduto{$i}" required name="produtos[{$i}].desconto" value="0" min="0" max="100">
+                        <input class="form-control form-numerico desconto_atual_pedido" id="descProduto{$i}" required name="produtos[{$i}].desconto" value="0" min="0" max="100">
                     </div>
                 </div>
                 <button class="btn btn-danger oculta-altera">Remover</button>
@@ -47,6 +47,16 @@
 </div>
 <script>
     ControlePagina.iniciaForm($('#formPedido'), '/pedido', 'id', 'Pedido', 'o');
+    (function(){
+        var oForm = $('#formProdutos').data('form');
+        oCampo = $('.desconto_atual_pedido', oForm);
+        $('#idCliente').on('retornoAjax', function(e, oRetorno){
+            oCampo.val(oRetorno.desconto_padrao);
+        });
+        $('#idCliente').on('retornoAjaxVazio', function(){
+            oCampo.val('');
+        });
+    }());
     $('#calculaTotalPedido').on('click', function(){
         var aQtd   = $('[id^="qtdProduto"]');
         var aPreco = $('[id^="precoProduto"]');
