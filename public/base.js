@@ -202,6 +202,7 @@ const ControlePagina = (function(){
                 }).then(function(oRetorno){
                     if(oRetorno.result == AJAX_SUCESSO && oRetorno.registro != null){
                         oContainer.show();
+                        
                         for (var sCampo in oRetorno.registro){
                             var oCampo = $('[name=' + sCampo + ']', oForm);
                             oCampo.val(oRetorno.registro[sCampo]);
