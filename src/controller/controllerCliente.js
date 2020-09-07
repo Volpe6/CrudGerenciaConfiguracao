@@ -133,28 +133,30 @@ const ControllerCliente = {
         try {
             if(entidade.id) {
                 await Cliente.update({
-                    nome      : entidade.nome,
-                    cpf       : entidade.cpf,
-                    logradouro: entidade.logradouro,
-                    numero    : entidade.numero,
-                    bairro    : entidade.bairro,
-                    cidade    : entidade.cidade,
-                    cep       : entidade.cep,
-                    estado    : entidade.estado
+                    nome            : entidade.nome,
+                    cpf             : entidade.cpf,
+                    logradouro      : entidade.logradouro,
+                    numero          : entidade.numero,
+                    bairro          : entidade.bairro,
+                    cidade          : entidade.cidade,
+                    cep             : entidade.cep,
+                    estado          : entidade.estado,
+                    desconto_padrao : entidade.desconto_padrao
                 },{
                     where: {id: entidade.id}
                 });
                 mensagem = 'Registro atualizado com sucesso';
             } else {
                 model = await Cliente.create({ 
-                    nome      : entidade.nome,
-                    cpf       : entidade.cpf,
-                    logradouro: entidade.logradouro,
-                    numero    : entidade.numero,
-                    bairro    : entidade.bairro,
-                    cidade    : entidade.cidade,
-                    cep       : entidade.cep,
-                    estado    : entidade.estado
+                    nome            : entidade.nome,
+                    cpf             : entidade.cpf,
+                    logradouro      : entidade.logradouro,
+                    numero          : entidade.numero,
+                    bairro          : entidade.bairro,
+                    cidade          : entidade.cidade,
+                    cep             : entidade.cep,
+                    estado          : entidade.estado,
+                    desconto_padrao : entidade.desconto_padrao
                 });
                 mensagem = 'Registro incluido com sucesso';
             }

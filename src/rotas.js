@@ -17,7 +17,8 @@ retorna todos os produtos com a seguinte estrutura:
     {
       "id": ,
       "descricao": "",
-      "fabricante": ""
+      "fabricante": "",
+      "preco_unitario": ""
     }
   ]
 }
@@ -32,7 +33,8 @@ Exemplo: "http://localhost:3333/produto/1" retornara a seguinte estrutura de dad
   "registro": {
     "id": ,
     "descricao": "",
-    "fabricante": ""
+    "fabricante": "",
+    "preco_unitario": ""
   }
 }
  */
@@ -50,7 +52,8 @@ estrutura de dados esperada:
 {
 	"id": "",
 	"descricao": "",
-	"fabricante": ""
+    "fabricante": "",
+    "preco_unitario": ""
 }
 */
 rotas.post('/produto', controllerProduto.store);
@@ -73,7 +76,8 @@ Exemplo: "http://localhost:3333/cliente/1" retornara a seguinte estrutura de dad
     "bairro": "",
     "cidade": "",
     "cep": "",
-    "estado": ""
+    "estado": "",
+    "desconto_padrao": ""
   }
 }
  */
@@ -106,15 +110,16 @@ para atualizar um registro basta passar o id junto das outras informações no j
 para criar um registro basta passar um id em branco nas requisições.
 estrutura de dados esperada:
 {
-	"id"        :"",
-	"nome"      : "",
-	"cpf"       : "",
-	"logradouro": "",
-	"numero"    : "",
-	"bairro"    : "",
-	"cidade"    : "",
-	"cep"       : "",
-	"estado"    : ""
+	"id"              :"",
+	"nome"            : "",
+	"cpf"             : "",
+	"logradouro"      : "",
+	"numero"          : "",
+	"bairro"          : "",
+	"cidade"          : "",
+	"cep"             : "",
+    "estado"          : "",
+    "desconto_padrao" : ""
 }
 */
 rotas.post('/cliente', controllerCliente.store);

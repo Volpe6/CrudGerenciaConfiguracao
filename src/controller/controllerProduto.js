@@ -47,8 +47,9 @@ const ControllerProduto = {
         try {
             if(entidade.id) {
                 await Produto.update({
-                    descricao : entidade.descricao,
-                    fabricante: entidade.fabricante
+                    descricao     : entidade.descricao,
+                    fabricante    : entidade.fabricante,
+                    preco_unitario: entidade.preco_unitario
                 },{
                     where: {
                         id: entidade.id
@@ -56,8 +57,9 @@ const ControllerProduto = {
                 mensagem = 'Registro atualizado com sucesso';
             } else {
                 model = await Produto.create({ 
-                    descricao : entidade.descricao,
-                    fabricante: entidade.fabricante
+                    descricao     : entidade.descricao,
+                    fabricante    : entidade.fabricante,
+                    preco_unitario: entidade.preco_unitario
                 });
                 mensagem = 'Registro incluido com sucesso';
             }

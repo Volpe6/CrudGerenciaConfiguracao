@@ -36,6 +36,10 @@ Cliente.init({
         type: DataTypes.STRING,
         allowNull: false
     },
+    desconto_padrao: {
+        type: DataTypes.DECIMAL,
+        allowNull: false
+    }
 }, {
     //outras opções do modelo
     sequelize,//instancia da conexao
