@@ -204,6 +204,11 @@ const ControlePagina = (function(){
                         oContainer.show();
                         for (var sCampo in oRetorno.registro){
                             $('[name=' + sCampo + ']', oForm).val(oRetorno.registro[sCampo]);
+                            var oCampo = $('[name=' + sCampo + ']', oForm);
+                            oCampo.val(oRetorno.registro[sCampo]);
+                            if(oCampo.hasClass('masked')){
+                                oCampo[0].dispatchEvent(new KeyboardEvent('keyup'));
+                            }
                         }
                     }
                     else {
