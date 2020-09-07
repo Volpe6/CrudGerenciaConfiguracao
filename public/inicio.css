@@ -47,10 +47,12 @@ body {
 .navegacao {
     background: var(--cor-destaque-2);
     height: 2rem;
+    padding: 0;
 }
 
 .navegacao > ul {
     margin: 0;
+    height: 100%;
 }
 
 .navegacao > ul > li {
@@ -74,4 +76,17 @@ body {
     min-height: calc(100vh - 9.5rem);
     border: 0.25rem solid var(--cor-destaque-3);
     border-bottom: none;
+}
+
+.tabela-dados-acoes tr > td:last-child {
+    width: 1%;
+    white-space: nowrap;
+}
+
+#cabecalhoPagina {
+    cursor: pointer;
+}
+
+#cabecalhoPagina:hover {
+    text-decoration: underline;
 }

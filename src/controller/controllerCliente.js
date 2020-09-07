@@ -86,6 +86,39 @@ const ControllerCliente = {
         }
 
         const entidade = req.body;
+        let atributosEsperados = [ 
+            'nome',
+            'cpf',
+            'logradouro',
+            'numero',
+            'bairro',
+            'cidade',
+            'cep',
+            'estado'  
+        ];
+
+        for(let i = 0; i < atributosEsperados.length; i++) {
+            let atributo = atributosEsperados[i];
+            if(!entidade.hasOwnProperty(`${atributo}`)) {
+                return res.status(200).json({
+                    result: 'erro',
+                    msg   : `o campo '${atributo}' esta em branco`
+                });
+            }
+        }
+
+        for([key, value] of Object.entries(entidade)) {
+            if(key == 'id') {
+                continue;
+            }
+            if(typeof value == 'undefined' || value =="") {
+                return res.status(200).json({
+                    result: 'erro',
+                    msg   : `o campo '${key}' nao foi informado`
+                });
+            }
+        }
+
         entidade.cpf = removeTracosPontos(entidade.cpf);
         if(!isCpfValido(entidade.cpf)) {
             return res.status(200).json({
