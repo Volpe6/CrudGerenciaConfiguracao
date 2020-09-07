@@ -413,13 +413,36 @@ const ControlePagina = (function(){
                 }).then(function(oRetorno){
                     if(oRetorno.result == AJAX_SUCESSO && oRetorno.registro != null){
                         oContainer.show();
-                        for (var sCampo in oRetorno.registro){
-                            var oCampo = $('[name=' + sCampo + ']', oForm);
-                            oCampo.val(oRetorno.registro[sCampo]);
-                            if(oCampo.hasClass('masked')){
-                                oCampo[0].dispatchEvent(new KeyboardEvent('keyup'));
+                        function aplicaValores(oAlvo, oValores, sPrefixo){
+                            for (var sCampo in oValores){
+                                var sCampoPref = sCampo;
+                                if(sPrefixo){
+                                    sCampoPref = sPrefixo + '.' + sCampo;
+                                }
+                                var oCampo = $('[name="' + sCampoPref + '"]', oAlvo);
+                                if(oCampo.hasClass('cadastro-multiplo')){
+                                    if($.isArray(oValores[sCampo])){
+                                        var sOrigem = oCampo.attr('data-origem-dados');
+                                        oValores[sCampo].forEach(function(oEl, iIndice){
+                                            $('>.btn-success', oCampo)[0].click();
+                                            if(sOrigem){
+                                                oEl = oEl[sOrigem];
+                                            }
+                                            aplicaValores(oCampo, oEl, sCampoPref + '[' + (iIndice + 1) + ']');
+                                        });
+                                    }
+                                }
+                                else {
+                                    sCampo = oCampo.attr('data-buscar') || sCampo;
+                                    oCampo.val(oValores[sCampo]);
+                                    oCampo.trigger('change')
+                                    if(oCampo.hasClass('masked')){
+                                        oCampo[0].dispatchEvent(new KeyboardEvent('keyup'));
+                                    }
+                                }
                             }
                         }
+                        aplicaValores(oForm, oRetorno.registro, '');
                     }
                     else {
                         mostraModalNormal('Erro!', 'Registro não encontrado!', function(){
