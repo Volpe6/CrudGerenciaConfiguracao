@@ -4,11 +4,11 @@
         <div class="form-group">
             <label for="idCliente">Cliente:</label><br/>
             <input type="number" class="form-control form-externo" data-alvo="clienteNome" data-request="/cliente/" data-coluna="nome"
-                id="idCliente" required name="idCliente" aria-describedby="idClienteAjuda" min="1"> 
+                id="idCliente" required name="cliente_id" aria-describedby="idClienteAjuda" min="1"> 
             <small id="clienteNome" class="form-text text-muted form-externo-alvo"></small>
             <small id="idClienteAjuda" class="form-text text-muted">Digite o código do cliente para carregar automáticamente.</small>
         </div>
-        <fieldset class="cadastro-multiplo" name="produtos">
+        <fieldset class="cadastro-multiplo" name="produtos" data-unico="produtos[{$i}].id" data-mensagem-unico="O mesmo produto">
             <div class="container-cadastro-multiplo">
                 <span class="cadastro-multiplo-vazio">Nenhum Produto adicionado.</span>
             </div>

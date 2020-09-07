@@ -277,6 +277,127 @@ const ControlePagina = (function(){
         }
     }
 
+    function extraiDadosForm(oForm){
+        return oForm.serializeArray().reduce(function(oAccum, oEl){
+            var oCampo = $('[name="' + oEl.name + '"]', oForm);
+            if(oCampo.attr('data-remove-especial')){
+                oEl.value = oEl.value.replace(/\W/g, '');
+            }
+            if(oCampo.hasClass('form-numerico')){
+                oEl.value = oEl.value.replace(',', '.');
+            }
+            var aEl = oEl.name.split('.');
+            if(aEl.length > 1){
+                var oAtual = oAccum;
+                aEl.forEach(function(sEl, iEl){
+                    var oMatch = sEl.match(/(\w+)\[(\d+)\]/);
+                    if(iEl == aEl.length - 1){
+                        if(oMatch && oMatch[2]){
+                            oAtual[oMatch[1]][oMatch[2]] = oEl.value;
+                        }
+                        else {
+                            oAtual[sEl] = oEl.value;
+                        }
+                    }
+                    else {
+                        var oNovo = {};
+                        if(oMatch && oMatch[2]){
+                            if(oAtual[oMatch[1]]){
+                                oAtual = oAtual[oMatch[1]];
+                                if(oAtual[oMatch[2]]){
+                                    oAtual = oAtual[oMatch[2]];
+                                }
+                                else {
+                                    oAtual[oMatch[2]] = oNovo;
+                                    oAtual = oNovo;
+                                }
+                            }
+                            else {
+                                oAtual[oMatch[1]] = [];
+                                oAtual = oAtual[oMatch[1]];
+                                oAtual[oMatch[2]] = oNovo;
+                                oAtual = oNovo;
+                            }
+                        }
+                        else {
+                            if(oAtual[sEl]){
+                                oAtual = oAtual[sEl];
+                            }
+                            else {
+                                oAtual[sEl] = oNovo;
+                                oAtual = oNovo;
+                            }
+                        }
+                    }
+                });
+            }
+            else {
+                oAccum[oEl.name] = oEl.value;
+            }
+            return oAccum
+        }, {});
+    }
+
+    function limpaFormData(oAtual){
+        for(var sEl in oAtual){
+            if($.isArray(oAtual[sEl])){
+                oAtual[sEl] = oAtual[sEl].filter(function(oEl){
+                    return oEl != null;
+                });
+                limpaFormData(oAtual[sEl]);
+            }
+            else if (typeof(oAtual[sEl]) == 'object'){
+                limpaFormData(oAtual[sEl]);
+            }
+        }
+    }
+
+    function validaFormData(oForm, oFormData){
+        try {
+            $('.cadastro-multiplo', oForm).each(function(oEl){
+                var self = $(this);
+                var aUnico = self.attr('data-unico') && self.attr('data-unico').split('.');
+                if(aUnico){
+                    var aAtu = [oFormData];
+                    aUnico.forEach(function(sEl, iEl){
+                        var aNovo = [];
+                        if(iEl == aUnico.length - 1){
+                            aAtu.forEach(function(oAtu){
+                                if(aNovo.indexOf(oAtu[sEl]) > -1){
+                                    throw new Error(self.attr('data-mensagem-unico') + ' não pode estar duplicado.');
+                                }
+                                aNovo.push(oAtu[sEl]);
+                            });
+                        }
+                        else {
+                            var oMatch = sEl.match(/(\w+)\[{\$i}]/);
+                            if(oMatch && oMatch[1]){
+                                aAtu.forEach(function(oAtu){
+                                    if(oAtu[oMatch[1]]){
+                                        aNovo = aNovo.concat(oAtu[oMatch[1]]);
+                                    }
+                                });
+                            }
+                            else {
+                                aAtu.forEach(function(oAtu){
+                                    if(oAtu[sEl]){
+                                        aNovo.push(oAtu[sEl]);
+                                    }
+                                });
+                            }
+                            aAtu = aNovo;
+                        }
+                    })
+                }
+            });
+        }
+        catch(ex){
+            mostraModalNormal('Erro!', ex.message);
+            return false;
+        }
+        return true;
+    }
+
     function iniciaForm(oForm, sUrl, sId, sItem, sSufixo){
         var id;
         var sOperacao = 'Incluid' + sSufixo;
@@ -292,7 +413,6 @@ const ControlePagina = (function(){
                 }).then(function(oRetorno){
                     if(oRetorno.result == AJAX_SUCESSO && oRetorno.registro != null){
                         oContainer.show();
-                        
                         for (var sCampo in oRetorno.registro){
                             var oCampo = $('[name=' + sCampo + ']', oForm);
                             oCampo.val(oRetorno.registro[sCampo]);
@@ -315,93 +435,25 @@ const ControlePagina = (function(){
             if($(e.originalEvent.submitter).attr('type') != 'submit'){
                 return false;
             }
-            var formData = oForm.serializeArray().reduce(function(oAccum, oEl){
-                var oCampo = $('[name="' + oEl.name + '"]', oForm);
-                if(oCampo.attr('data-remove-especial')){
-                    oEl.value = oEl.value.replace(/\W/g, '');
-                }
-                if(oCampo.hasClass('form-numerico')){
-                    oEl.value = oEl.value.replace(',', '.');
-                }
-                var aEl = oEl.name.split('.');
-                if(aEl.length > 1){
-                    var oAtual = oAccum;
-                    aEl.forEach(function(sEl, iEl){
-                        var oMatch = sEl.match(/(\w+)\[(\d+)\]/);
-                        if(iEl == aEl.length - 1){
-                            if(oMatch && oMatch[2]){
-                                oAtual[oMatch[1]][oMatch[2]] = oEl.value;
-                            }
-                            else {
-                                oAtual[sEl] = oEl.value;
-                            }
-                        }
-                        else {
-                            var oNovo = {};
-                            if(oMatch && oMatch[2]){
-                                if(oAtual[oMatch[1]]){
-                                    oAtual = oAtual[oMatch[1]];
-                                    if(oAtual[oMatch[2]]){
-                                        oAtual = oAtual[oMatch[2]];
-                                    }
-                                    else {
-                                        oAtual[oMatch[2]] = oNovo;
-                                        oAtual = oNovo;
-                                    }
-                                }
-                                else {
-                                    oAtual[oMatch[1]] = [];
-                                    oAtual = oAtual[oMatch[1]];
-                                    oAtual[oMatch[2]] = oNovo;
-                                    oAtual = oNovo;
-                                }
-                            }
-                            else {
-                                if(oAtual[sEl]){
-                                    oAtual = oAtual[sEl];
-                                }
-                                else {
-                                    oAtual[sEl] = oNovo;
-                                    oAtual = oNovo;
-                                }
-                            }
-                        }
-                    });
-                }
-                else {
-                    oAccum[oEl.name] = oEl.value;
-                }
-                return oAccum
-            }, {});
-            function limpaFormData(oAtual){
-                for(var sEl in oAtual){
-                    if($.isArray(oAtual[sEl])){
-                        oAtual[sEl] = oAtual[sEl].filter(function(oEl){
-                            return oEl != null;
-                        });
-                        limpaFormData(oAtual[sEl]);
-                    }
-                    else if (typeof(oAtual[sEl]) == 'object'){
-                        limpaFormData(oAtual[sEl]);
-                    }
-                }
-            }
+            var formData = extraiDadosForm(oForm);
             limpaFormData(formData);
             formData[sId] = id;
-            formData = JSON.stringify(formData);
-            $.post({
-                url: sUrl,
-                data: formData,
-                dataType: "json",
-                contentType : "application/json"
-            }).then(getFuncaoProcessaAjaxSucesso(sItem, sSufixo, sOperacao, function(){
-                if(id){
-                    window.history.back();
-                }
-                else {
-                    $('.form-control').val('').first().focus()[0].scrollIntoView();
-                }
-            }), processaAjaxErro);
+            if(validaFormData(oForm, formData)){
+                formData = JSON.stringify(formData);
+                $.post({
+                    url: sUrl,
+                    data: formData,
+                    dataType: "json",
+                    contentType : "application/json"
+                }).then(getFuncaoProcessaAjaxSucesso(sItem, sSufixo, sOperacao, function(){
+                    if(id){
+                        window.history.back();
+                    }
+                    else {
+                        $('.form-control').val('').first().focus()[0].scrollIntoView();
+                    }
+                }), processaAjaxErro);
+            }
             return false;
         });
     }
