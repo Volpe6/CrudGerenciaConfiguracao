@@ -1,9 +1,63 @@
 <div class="container">
     <form action="pedido" method="POST" id="formPedido" name="pedido">
         <h3><span id="tituloOperacao">Incluir</span> Pedido</h3>
+        <div class="form-group">
+            <label for="idCliente">Cliente:</label><br/>
+            <input type="number" class="form-control form-externo" data-alvo="clienteNome" data-request="/cliente/" data-coluna="nome"
+                id="idCliente" required name="cliente_id" aria-describedby="idClienteAjuda" min="1"> 
+            <small id="clienteNome" class="form-text text-muted form-externo-alvo"></small>
+            <small id="idClienteAjuda" class="form-text text-muted">Digite o código do cliente para carregar automáticamente.</small>
+        </div>
+        <fieldset class="cadastro-multiplo" name="produtos" data-origem-dados="pedidoProduto" data-unico="produtos[{$i}].id" data-mensagem-unico="O mesmo produto">
+            <div class="container-cadastro-multiplo">
+                <span class="cadastro-multiplo-vazio">Nenhum Produto adicionado.</span>
+            </div>
+            <div class="form-group form-cadastro-multiplo" style="display: none;">
+                <div class="form-group">
+                    <label for="idProduto{$i}">Produto:</label><br/>
+                    <input type="number" class="form-control form-externo desativa-altera" data-alvo="produto{$i}Nome" data-request="/produto/" data-coluna="descricao"
+                        id="idProduto{$i}" required name="produtos[{$i}].id" min="1">
+                    <small id="produto{$i}Nome" class="form-text text-muted form-externo-alvo"></small>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label for="qtdProduto{$i}">Quantidade:</label><br/>
+                        <input class="form-control form-numerico" id="qtdProduto{$i}" required name="produtos[{$i}].quantidade" min="1">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="precoProduto{$i}">Preço Unitário (R$):</label><br/>
+                        <input class="form-control form-numerico" id="precoProduto{$i}" required name="produtos[{$i}].preco_unitario" min="1" data-decimais="2">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="descProduto{$i}">Desconto (%):</label><br/>
+                        <input class="form-control form-numerico" id="descProduto{$i}" required name="produtos[{$i}].desconto" value="0" min="0" max="100">
+                    </div>
+                </div>
+                <button class="btn btn-danger oculta-altera">Remover</button>
+            </div>
+            <button class="btn btn-success oculta-altera">Novo</button>
+        </fieldset>
+        <div class="form-group row">
+            <label for="totalPedido" class="col-12 col-md-1">Total:</label>
+            <input class="form-control col-sm-8 col-md-4 col-lg-3 offset-md-1" disabled id="totalPedido">
+            <button id="calculaTotalPedido" class="col-sm-4 col-md-2 col-lg-1 btn btn-primary">Calcular</button>
+        </div>
         <button type="submit" class="btn btn-primary">Enviar</button>
     </form>
 </div>
 <script>
-    ControlePagina.iniciaForm($('#formPedido'), '/pedido', 'id', 'pedido', 'o');
+    ControlePagina.iniciaForm($('#formPedido'), '/pedido', 'id', 'Pedido', 'o');
+    $('#calculaTotalPedido').on('click', function(){
+        var aQtd   = $('[id^="qtdProduto"]');
+        var aPreco = $('[id^="precoProduto"]');
+        var aDesc  = $('[id^="descProduto"]');
+        var iTotal = 0;
+        aQtd.each(function(iEl){
+            var iQtd   = parseFloat(aQtd.eq(iEl).val());
+            var iPreco = parseFloat(aPreco.eq(iEl).val().replace(',', '.'));
+            var iDesc  = parseFloat(aDesc.eq(iEl).val());
+            iTotal += (iQtd * iPreco) * (1 - iDesc / 100);
+        });
+        $('#totalPedido').val(iTotal.toString().replace('.', ','));
+    })
 </script>

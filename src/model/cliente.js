@@ -43,14 +43,15 @@ Cliente.init({
 }, {
     //outras opções do modelo
     sequelize,//instancia da conexao
-    modelName: 'Cliente',
+    modelName: 'cliente',
     tableName: 'tbcliente',
     timestamps: false
 });
 
 Cliente.hasMany(Pedido, {
-    onDelete: 'CASCADE'
+    onDelete: 'CASCADE',
+    foreignKey: 'cliente_id'
 });
-Pedido.belongsTo(Cliente);
+Pedido.belongsTo(Cliente, { foreignKey: 'cliente_id' });
 
 module.exports = Cliente;

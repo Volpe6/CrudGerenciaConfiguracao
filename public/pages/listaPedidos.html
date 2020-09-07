@@ -20,7 +20,7 @@
         ControlePagina.carregaRegistrosHtml({
                  request:    'pedido'
                 ,chave:      ['id']
-                ,colunas:    ['id', 'Cliente.nome', 'Produtos.descricao']
+                ,colunas:    ['id', 'cliente.nome', 'produtos.descricao']
                 ,alvo:       $('>tbody', oTabela)
                 ,manutencao: 'manutencaoPedidos.html'
         }).then(function(){

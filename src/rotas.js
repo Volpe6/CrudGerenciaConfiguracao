@@ -134,8 +134,8 @@ estrutura:
   "registros": [
     {
       "id": ,
-      "ClienteId": ,
-      "Cliente": {
+      "cliente_id": ,
+      "cliente": {
         "id": ,
         "nome": "",
         "cpf": "",
@@ -146,17 +146,18 @@ estrutura:
         "cep": "",
         "estado": ""
       },
-      "Produtos": [
+      "produtos": [
         {
           "id": ,
           "descricao": "",
           "fabricante": "",
-          "PedidoProduto": {
+          "pedidoProduto": {
+            "id": ,
             "quantidade": ,
-            "preco_unitario": ,
-            "desconto": ,
-            "PedidoId": ,
-            "ProdutoId": 
+            "preco_unitario": "",
+            "desconto": "",
+            "pedido_id": ,
+            "produto_id": 
           }
         }
       ]
