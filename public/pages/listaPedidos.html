@@ -1,0 +1,44 @@
+<div class="container">
+    <button id="botaoIncluirPedidos" class="btn btn-success">Novo</button>
+    <table id="dataTableListaPedidos" class="tabela-dados tabela-dados-acoes table table-striped table-bordered" style="width:100%; display: none;">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Cliente</th>
+                <th>Produtos</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <script>
+        $('#botaoIncluirPedidos').on('click', function(){
+            ControlePagina.carregaPagina('manutencaoPedidos.html');
+        })
+        oTabela = $('#dataTableListaPedidos');
+        ControlePagina.carregaRegistrosHtml({
+                 request:    'pedido'
+                ,chave:      ['id']
+                ,colunas:    ['id', 'Cliente.nome', 'Produtos.descricao']
+                ,alvo:       $('>tbody', oTabela)
+                ,manutencao: 'manutencaoPedidos.html'
+        }).then(function(){
+            oTabela.DataTable({
+                 "paging": false
+                ,"info": false
+                ,"language": ControlePagina.DATA_TABLES_L18N
+                ,"columns": [
+                    null,
+                    null,
+                    null,
+                    { 
+                        "orderable": false
+                    }
+                ]
+            });
+            oTabela.show();
+            $('input[type="search"]').addClass('form-control');
+        });
+        </script>
+</div>

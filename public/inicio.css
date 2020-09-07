@@ -17,6 +17,7 @@ body {
     position: fixed;
     right: 0;
     left: 0;
+    z-index: 1;
 }
 
 .cabecalho-inicial {
@@ -83,10 +84,27 @@ body {
     white-space: nowrap;
 }
 
-#cabecalhoPagina {
-    cursor: pointer;
+.shell {
+    display: block;
 }
 
-#cabecalhoPagina:hover {
-    text-decoration: underline;
+.shell > span {
+    padding: 0.625rem .65rem;
+    height: calc(1.5em + .75rem + 2px);
+    display: flex;
+    font-weight: 400;
+    z-index: -1;
+}
+
+textarea:invalid,input:invalid {
+    outline: none;
+    box-shadow: 0 0 3px 1px red;
+}
+
+form:invalid {
+    outline: none;
+}
+
+:focus {
+    outline: auto var(--cor-destaque-4) !IMPORTANT;
 }

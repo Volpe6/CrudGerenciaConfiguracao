@@ -21,12 +21,11 @@ const ControlePagina = (function(){
         }
     }).on('load', function(){
         oContainer = $('#base_pagina');
-        $('#cabecalhoPagina').on('click', function(){
-            carregaPagina('bemVindo');
-        });
         oModal = $('#modalStatus').modal({
              show: false
             ,backdrop: 'static'
+        }).on('shown.bs.modal', function(event) {
+            $('.btn-primary', modalBotoes).focus();
         });
         modalTitulo   = $('#modalStatusTitulo',   oModal);
         modalConteudo = $('#modalStatusConteudo', oModal);
@@ -63,7 +62,11 @@ const ControlePagina = (function(){
             var oEl = $(this);
             oEl.on('click', function(sTarget){
                 carregaPagina(sTarget + '.html');
-            }.bind(null, oEl.attr('data-target')))
+            }.bind(null, oEl.attr('data-target'))).on('keydown', function(e){
+                if(e.key && (e.key.toLowerCase() == 'space' || e.key.toLowerCase() == 'enter')){
+                    $(this).trigger('click');
+                }
+            });
         });
     }
 
@@ -94,8 +97,9 @@ const ControlePagina = (function(){
     function mostraModalNormal(sTitulo, sConteudo, fnOk, bDismiss = true){
         modalTitulo.html(sTitulo);
         modalConteudo.html(sConteudo);
+        oModal.modal('show');
         $('.btn', modalBotoes).show().off('click');
-        $('.btn-primary', modalBotoes).on('click', function(){
+        $('.btn-primary', modalBotoes).focus().on('click', function(){
             if(bDismiss){
                 oModal.modal('hide');
             }
@@ -104,14 +108,14 @@ const ControlePagina = (function(){
             }
         });
         $('.btn-secondary', modalBotoes).hide();
-        oModal.modal('show');
     }
 
     function mostraModalConfirma(sTitulo, sConteudo, fnOk, fnCancela, bDismissOk = true, bDismissCancela = true){
         modalTitulo.html(sTitulo);
         modalConteudo.html(sConteudo);
+        oModal.modal('show');
         $('.btn', modalBotoes).show().off('click');
-        $('.btn-primary', modalBotoes).on('click', function(){
+        $('.btn-primary', modalBotoes).focus().on('click', function(){
             if(bDismissOk){
                 oModal.modal('hide');
             }
@@ -127,28 +131,67 @@ const ControlePagina = (function(){
                 fnCancela();
             }
         });
-        oModal.modal('show');
     }
 
     function trataErroForm(oRetorno, sMensagem){
         var oConteudo = $('<div>');
         $('<p>').html(sMensagem).appendTo(oConteudo);
-        if(oRetorno.message){
-            $('<p>').html(oRetorno.message).appendTo(oConteudo);
+        if(typeof(oRetorno) == 'string'){
+            $('<p>').html(oRetorno).appendTo(oConteudo);
         }
-        if(oRetorno.errors){
-            var oUl = $('<ul>').appendTo(oConteudo);
-            oRetorno.errors.forEach(function(oErro){
-                $('<li>').html(oErro.message).appendTo(oUl);
-            });
+        else {
+            if(oRetorno.message){
+                $('<p>').html(oRetorno.message).appendTo(oConteudo);
+            }
+            if(oRetorno.errors){
+                var oUl = $('<ul>').appendTo(oConteudo);
+                oRetorno.errors.forEach(function(oErro){
+                    $('<li>').html(oErro.message).appendTo(oUl);
+                });
+            }
         }
         mostraModalNormal('Erro!', oConteudo);
+    }
+
+    function iniciaCamposForm(oForm){
+        new InputMask({
+            masked: ".campo-mascara"
+        });
+        $('.busca-cep', oForm).on('change', function(){
+            var self = $(this);
+            var sVal = self.val();
+            if(sVal){
+                sVal = sVal.replace(/\D/g, '')
+                if(sVal.length == 8){
+                    $.get('/cliente/cep/' + sVal).then(trataRetornoCep.bind(self, oForm), function(){
+                        mostraModalNormal('Erro!', 'Não foi possível encontrar o cep informado.', function(){
+                            self.val('');
+                        });
+                    });
+                }
+            }
+        })
+    }
+
+    function trataRetornoCep(oForm, oRetorno){
+        if(oRetorno.erro){
+            mostraModalNormal('Erro!', 'Não foi possível encontrar o cep informado.', function(){
+                this.val('');
+            });
+        }
+        else {
+            $('.preenche-cep', oForm).each(function(){
+                var self = $(this);
+                self.val(oRetorno[self.attr('data-cep-fill') || self.attr('name')]);
+            })
+        }
     }
 
     function iniciaForm(oForm, sUrl, sId, sItem, sSufixo){
         var id;
         var sOperacao = 'Incluid' + sSufixo;
         executaImediato(function(){
+            iniciaCamposForm();
             id = getParametroUrl('id');
             if(id){
                 $('#tituloOperacao').html('Alterar');
@@ -174,6 +217,9 @@ const ControlePagina = (function(){
         })
         oForm.submit(function(e){
             var formData = oForm.serializeArray().reduce(function(oAccum, oEl){
+                if($('[name="' + oEl.name + '"]', oForm).attr('data-remove-especial')){
+                    oEl.value = oEl.value.replace(/\W/g, '');
+                }
                 oAccum[oEl.name] = oEl.value;
                 return oAccum
             }, {});
@@ -197,7 +243,7 @@ const ControlePagina = (function(){
     function getFuncaoProcessaAjaxSucesso(sItem, sSufixo, sOperacao, fnSucesso){
         return function(oRetorno){
             if(oRetorno.result == AJAX_FALHA){
-                trataErroForm(oRetorno.msg, 'Não foi possível processar ' + sSufixo + ' ' + sOperacao + '...');
+                trataErroForm(oRetorno.msg, 'O ' + sItem + ' não foi ' + sOperacao +'...<br/>Não foi possível processar a operação...');
             }
             else {
                 mostraModalNormal('Sucesso!', sItem + ' ' + sOperacao + ' com Sucesso!');
@@ -235,7 +281,13 @@ const ControlePagina = (function(){
                 oRegistros.registros.forEach(function(oRegistro){
                     var oLinha = $('<tr>').appendTo(oConfig.alvo);
                     oConfig.colunas.forEach(function(sColuna){
-                        $('<td>').html(oRegistro[sColuna]).appendTo(oLinha);
+                        aColunas = sColuna.split('.');
+                        if(aColunas.length == 1){
+                            $('<td>').html(oRegistro[sColuna]).appendTo(oLinha);
+                        }
+                        else {
+                            $('<td>').html(preparaRegistroComplexo(aColunas, oRegistro)).appendTo(oLinha);
+                        }
                     });
                     var oAcoes = $('<td>').appendTo(oLinha);
                     $('<button>').html('Remover').addClass('btn btn-danger').on('click', function(sId){
@@ -254,6 +306,21 @@ const ControlePagina = (function(){
                 });
             }
         });
+    }
+
+    function preparaRegistroComplexo(aColunas, oRegistro){
+        var sAtu = aColunas.shift();
+        if($.isArray(oRegistro[sAtu])){
+            var aRet = [];
+            oRegistro[sAtu].forEach(function(oEl){
+                aRet.push(preparaRegistroComplexo($.extend([], aColunas), oEl));
+            });
+            return aRet.join(', ');
+        }
+        if(typeof(oRegistro[sAtu]) == 'object'){
+            return preparaRegistroComplexo(aColunas, oRegistro[sAtu]);
+        }
+        return oRegistro[sAtu];
     }
 
     return {

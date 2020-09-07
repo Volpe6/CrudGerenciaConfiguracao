@@ -1,7 +1,45 @@
 <div class="container">
-    <form action="produto" method="POST" id="formCliente" name="produto">
+    <form action="produto" method="POST" id="formCliente" name="cliente">
         <h3><span id="tituloOperacao">Incluir</span> Cliente</h3>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="form-group">
+            <label for="nomeCliente">Nome:</label>
+            <textarea class="form-control" id="nomeCliente" required name="nome" aria-describedby="nomeClienteAjuda" placeholder="Digite o nome."></textarea>
+            <small id="nomeClienteAjuda" class="form-text text-muted">Informe um nome para o cliente.</small>
+        </div>
+        <div class="form-group">
+            <label for="cpfCliente">CPF:</label>
+            <input class="form-control campo-mascara" id="cpfCliente" required name="cpf" aria-describedby="cpfClienteAjuda"
+                   placeholder="999.999.999-99" data-remove-especial="true" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}">
+            <small id="cpfClienteAjuda" class="form-text text-muted">Informe o cpf do cliente.</small>
+        </div>
+        <div class="form-group">
+            <label for="cepCliente">CEP:</label>
+            <input class="form-control campo-mascara busca-cep" id="cepCliente" required name="cep" aria-describedby="cepClienteAjuda"
+                   placeholder="99.999-999" data-remove-especial="true" pattern="\d{2}\.\d{3}-\d{3}">
+            <small id="cepClienteAjuda" class="form-text text-muted">Informe um CEP para busca.</small>
+        </div>
+        <div class="form-group">
+            <label for="numeroCliente">Número:</label>
+            <input class="form-control" id="numeroCliente" required name="numero" type="number" aria-describedby="numeroClienteAjuda">
+            <small id="numeroClienteAjuda" class="form-text text-muted">Informe o número do logradouro.</small>
+        </div>
+        <div class="form-group">
+            <label for="logradouroCliente">Logradouro:</label>
+            <input class="form-control preenche-cep" id="logradouroCliente" required name="logradouro">
+        </div>
+        <div class="form-group">
+            <label for="bairroCliente">Bairro:</label>
+            <input class="form-control preenche-cep" id="bairroCliente" required name="bairro">
+        </div>
+        <div class="form-group">
+            <label for="cidadeCliente">Cidade:</label>
+            <input class="form-control preenche-cep" data-cep-fill="localidade" id="cidadeCliente" required name="cidade">
+        </div>
+        <div class="form-group">
+            <label for="estadoCliente">Estado:</label>
+            <input class="form-control preenche-cep" data-cep-fill="uf" maxlength="2" id="estadoCliente" required name="estado">
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar</button>
     </form>
 </div>
 <script>

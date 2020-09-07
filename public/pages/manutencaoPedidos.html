@@ -1,0 +1,9 @@
+<div class="container">
+    <form action="pedido" method="POST" id="formPedido" name="pedido">
+        <h3><span id="tituloOperacao">Incluir</span> Pedido</h3>
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+</div>
+<script>
+    ControlePagina.iniciaForm($('#formPedido'), '/pedido', 'id', 'pedido', 'o');
+</script>
