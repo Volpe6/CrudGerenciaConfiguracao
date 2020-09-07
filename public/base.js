@@ -281,7 +281,13 @@ const ControlePagina = (function(){
                 oRegistros.registros.forEach(function(oRegistro){
                     var oLinha = $('<tr>').appendTo(oConfig.alvo);
                     oConfig.colunas.forEach(function(sColuna){
-                        $('<td>').html(oRegistro[sColuna]).appendTo(oLinha);
+                        aColunas = sColuna.split('.');
+                        if(aColunas.length == 1){
+                            $('<td>').html(oRegistro[sColuna]).appendTo(oLinha);
+                        }
+                        else {
+                            $('<td>').html(preparaRegistroComplexo(aColunas, oRegistro)).appendTo(oLinha);
+                        }
                     });
                     var oAcoes = $('<td>').appendTo(oLinha);
                     $('<button>').html('Remover').addClass('btn btn-danger').on('click', function(sId){
@@ -300,6 +306,21 @@ const ControlePagina = (function(){
                 });
             }
         });
+    }
+
+    function preparaRegistroComplexo(aColunas, oRegistro){
+        var sAtu = aColunas.shift();
+        if($.isArray(oRegistro[sAtu])){
+            var aRet = [];
+            oRegistro[sAtu].forEach(function(oEl){
+                aRet.push(preparaRegistroComplexo($.extend([], aColunas), oEl));
+            });
+            return aRet.join(', ');
+        }
+        if(typeof(oRegistro[sAtu]) == 'object'){
+            return preparaRegistroComplexo(aColunas, oRegistro[sAtu]);
+        }
+        return oRegistro[sAtu];
     }
 
     return {
