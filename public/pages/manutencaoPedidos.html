@@ -4,21 +4,34 @@
         <div class="form-group">
             <label for="idCliente">Cliente:</label><br/>
             <input type="number" class="form-control form-externo" data-alvo="clienteNome" data-request="/cliente/" data-coluna="nome"
-                id="idCliente" required name="idCliente" aria-describedby="idClienteAjuda" min="1"></textarea>
+                id="idCliente" required name="idCliente" aria-describedby="idClienteAjuda" min="1"> 
             <small id="clienteNome" class="form-text text-muted form-externo-alvo"></small>
             <small id="idClienteAjuda" class="form-text text-muted">Digite o código do cliente para carregar automáticamente.</small>
         </div>
-        <fieldset class="cadastro-multiplo">
+        <fieldset class="cadastro-multiplo" name="produtos">
             <div class="container-cadastro-multiplo">
                 <span class="cadastro-multiplo-vazio">Nenhum Produto adicionado.</span>
             </div>
             <div class="form-group form-cadastro-multiplo" style="display: none;">
                 <div class="form-group">
-                    <label for="idProduto">Produto:</label><br/>
-                    <input type="number" class="form-control form-externo" data-alvo="produtoNome" data-request="/produto/" data-coluna="descricao"
-                        id="idProduto" required name="Produtos.id" aria-describedby="idProdutoAjuda" min="1"></textarea>
-                    <small id="produtoNome" class="form-text text-muted form-externo-alvo"></small>
-                    <small id="idProdutoAjuda" class="form-text text-muted">Digite o código do produto para carregar automáticamente.</small>
+                    <label for="idProduto{$i}">Produto:</label><br/>
+                    <input type="number" class="form-control form-externo" data-alvo="produto{$i}Nome" data-request="/produto/" data-coluna="descricao"
+                        id="idProduto{$i}" required name="produtos[{$i}].id" min="1">
+                    <small id="produto{$i}Nome" class="form-text text-muted form-externo-alvo"></small>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label for="qtdProduto{$i}">Quantidade:</label><br/>
+                        <input class="form-control form-numerico" id="qtdProduto{$i}" required name="produtos[{$i}].quantidade" min="1">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="precoProduto{$i}">Preço Unitário (R$):</label><br/>
+                        <input class="form-control form-numerico" id="precoProduto{$i}" required name="produtos[{$i}].preco_unitario" min="1" data-decimais="2">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="descProduto{$i}">Desconto (%):</label><br/>
+                        <input class="form-control form-numerico" id="descProduto{$i}" required name="produtos[{$i}].desconto" min="1" max="100">
+                    </div>
                 </div>
                 <button class="btn btn-danger">Remover</button>
             </div>
