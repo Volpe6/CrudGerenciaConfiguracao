@@ -211,11 +211,11 @@ const ControlePagina = (function(){
                     self.val(oMatch[0]);
                 }
                 var iMax = self.attr('min');
-                if(iMax && parseFloat(self.val()) < parseFloat(iMax)){
+                if(iMax && parseFloat(self.val().replace(',', '.')) < parseFloat(iMax)){
                     self.val(iMax);
                 }
                 var iMax = self.attr('max');
-                if(iMax && parseFloat(self.val()) > parseFloat(iMax)){
+                if(iMax && parseFloat(self.val().replace(',', '.')) > parseFloat(iMax)){
                     self.val(iMax);
                 }
             });
@@ -312,9 +312,16 @@ const ControlePagina = (function(){
         });
         oForm.submit(function(e){
             e.preventDefault();
+            if($(e.originalEvent.submitter).attr('type') != 'submit'){
+                return false;
+            }
             var formData = oForm.serializeArray().reduce(function(oAccum, oEl){
-                if($('[name="' + oEl.name + '"]', oForm).attr('data-remove-especial')){
+                var oCampo = $('[name="' + oEl.name + '"]', oForm);
+                if(oCampo.attr('data-remove-especial')){
                     oEl.value = oEl.value.replace(/\W/g, '');
+                }
+                if(oCampo.hasClass('form-numerico')){
+                    oEl.value = oEl.value.replace(',', '.');
                 }
                 var aEl = oEl.name.split('.');
                 if(aEl.length > 1){

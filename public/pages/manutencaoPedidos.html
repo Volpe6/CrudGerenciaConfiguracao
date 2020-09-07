@@ -30,16 +30,34 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="descProduto{$i}">Desconto (%):</label><br/>
-                        <input class="form-control form-numerico" id="descProduto{$i}" required name="produtos[{$i}].desconto" min="1" max="100">
+                        <input class="form-control form-numerico" id="descProduto{$i}" required name="produtos[{$i}].desconto" value="0" min="0" max="100">
                     </div>
                 </div>
                 <button class="btn btn-danger">Remover</button>
             </div>
             <button class="btn btn-success">Novo</button>
         </fieldset>
+        <div class="form-group row">
+            <label for="totalPedido" class="col-12 col-md-1">Total:</label>
+            <input class="form-control col-sm-8 col-md-4 col-lg-3 offset-md-1" disabled id="totalPedido">
+            <button id="calculaTotalPedido" class="col-sm-4 col-md-2 col-lg-1 btn btn-primary">Calcular</button>
+        </div>
         <button type="submit" class="btn btn-primary">Enviar</button>
     </form>
 </div>
 <script>
-    ControlePagina.iniciaForm($('#formPedido'), '/pedido', 'id', 'pedido', 'o');
+    ControlePagina.iniciaForm($('#formPedido'), '/pedido', 'id', 'Pedido', 'o');
+    $('#calculaTotalPedido').on('click', function(){
+        var aQtd   = $('[id^="qtdProduto"]');
+        var aPreco = $('[id^="precoProduto"]');
+        var aDesc  = $('[id^="descProduto"]');
+        var iTotal = 0;
+        aQtd.each(function(iEl){
+            var iQtd   = parseFloat(aQtd.eq(iEl).val());
+            var iPreco = parseFloat(aPreco.eq(iEl).val().replace(',', '.'));
+            var iDesc  = parseFloat(aDesc.eq(iEl).val());
+            iTotal += (iQtd * iPreco) * (1 - iDesc / 100);
+        });
+        $('#totalPedido').val(iTotal.toString().replace('.', ','));
+    })
 </script>
