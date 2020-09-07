@@ -11,6 +11,10 @@ Produto.init({
     fabricante: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    preco_unitario: {
+        type: DataTypes.DECIMAL,
+        allowNull: false
     }
 }, {
     //outras opções do modelo

@@ -6,6 +6,7 @@
                 <th>Id</th>
                 <th>Descrição</th>
                 <th>Fabricante</th>
+                <th>Preço Unitário</th>
                 <th>Açoes</th>
             </tr>
         </thead>
@@ -20,7 +21,7 @@
         ControlePagina.carregaRegistrosHtml({
                  request:    'produto'
                 ,chave:      ['id']
-                ,colunas:    ['id', 'descricao', 'fabricante']
+                ,colunas:    ['id', 'descricao', 'fabricante', 'preco_unitario']
                 ,alvo:       $('>tbody', oTabela)
                 ,manutencao: 'manutencaoProduto.html'
         }).then(function(){
@@ -29,6 +30,7 @@
                 ,"info": false
                 ,"language": ControlePagina.DATA_TABLES_L18N
                 ,"columns": [
+                    null,
                     null,
                     null,
                     null,
